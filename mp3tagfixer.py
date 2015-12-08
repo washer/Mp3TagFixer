@@ -59,10 +59,11 @@ for song in songfiles:
 				word = part[:idx]
 			else:
 				word = part
+
 			if word_count > 1:
-				title_str = title_str + " " + word
+				title_str = title_str + " " + word.title()
 			else:
-				title_str = title_str + word
+				title_str = title_str + word.title()
 
 	audio["artist"] = u"" + artist
 	audio["album"] = u"" + album
