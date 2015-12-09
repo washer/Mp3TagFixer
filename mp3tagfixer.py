@@ -4,6 +4,7 @@ from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 import os
 import sys
+import re
 
 if not len(sys.argv) == 2:
 	sys.exit("You must execute the script with 1 command line argument, containing the path to the folder containing mp3 files.\n"
@@ -16,17 +17,19 @@ artist = raw_input('name of artist: ')
 album = raw_input('name of album: ')
 year = raw_input('year of release (optional')
 songfiles = []
+albumname_matches = 0
+artistname_matches = 0
 
-#print album + ', by ' + artist
-
-#for root, dirs, files in os.walk(os.path.dirname(os.path.realpath(__file__))):
 for root, dirs, files in os.walk(file_path):
 	for file in files:
 		if file.endswith(".mp3"):
-			songfiles.append(r""+file)
+			songfiles.append(file)
+			if album.upper().lower() in file.upper().lower():
+				albumname_matches += 1
+			if artist.upper().lower() in file.upper().lower():
+				artistname_matches += 1
 
 songfiles.sort()
-#print songfiles
 
 # Different implementations to be tested. Maybe to be chosen with command line argument?
 
@@ -38,27 +41,34 @@ for song in songfiles:
 	title_str = ""
 	word_count = 0;
 
-	song_parts = song.split()
+	song_parts = re.split("\W+|_", song) # splits http://stackoverflow.com/questions/1059559/python-split-strings-with-multiple-delimiters
 	#print song_parts
 	for part in song_parts:
 		number_ok = True
-		
 		if part.startswith(tuple('0123456789')): 
 			for x in part:
 				if not x.isdigit():
 					number_ok = False
 			if number_ok:
-				# SET TRACK NO TO part
-				audio["tracknumber"] = part
+				if len(part) > 2:
+					continue
+				else:
+					# SET TRACK NO TO part
+					audio["tracknumber"] = part
 		else:
 			word = ""
 			word_count += 1
 			if 'mp3' in part:
-				idx = part.find('.mp3')
+				idx = part.find('mp3')
 				word = part[:idx]
 			else:
 				word = part
-
+			if albumname_matches > 1:
+				if part.upper().lower() == album.upper().lower():
+					continue
+			if artistname_matches > 1:
+				if part.upper().lower() == artist.upper().lower():
+					continue
 			if word_count > 1:
 				title_str = title_str + " " + word.title()
 			else:
@@ -67,24 +77,8 @@ for song in songfiles:
 	audio["artist"] = u"" + artist
 	audio["album"] = u"" + album
 	audio["title"] = u"" + title_str
-	print audio.pprint()
 	audio.save(v1=2)
-	#audio.save(v2_version=3)
-	#audio.save()
-	#print artist + ", " + album + ", " + title_str
-
-		#if part == album or part == artist: FIND A WAY TO CHECK IF ALL SONGS CONTAIN SAME TEXT - maybe loop and count?
-			#song_parts.remove(part)
-
-
-
-# Pain in the ass safety mode,
-
-#for song in songfiles:
-	#if(song.startswith(tuple('0123456789'))):
-	#	for i in range (0, len(song)):
-		#	if(!song[i].isdigit()):
-
-		#	if(song[i] != )
+	audio.save()
+	print albumname_matches
 
 print "Done editing files. Please check files for errors and correct if necessary."
