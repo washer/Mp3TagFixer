@@ -2,8 +2,8 @@
 # As of now fails when proper song title contains underscores and numbers.
 
 # TODO:
-# Check for multiple word names of artist and album
 # Make genre-tagging work
+# Figure out a way to handle artist name that contains common words?
 
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
@@ -51,34 +51,31 @@ if genre is not "":
 	tag_genre = True
 
 # Find all mp3 files in dir and sort them by filename.
-# TODO: Replace ugly flags using count
 for root, dirs, files in os.walk(file_path):
 	for file in files:
 		if file.endswith(".mp3"):
-			album_match_found = False # flags used to identify is matches already found (ugly, but works)
-			artist_match_found = False
 			songfiles.append(file)
-			if album.upper().lower() in file.upper().lower(): # checks if 
-				albumname_matches += 1
-				album_match_found = True
-			temp_album = album.replace(' ','_')
-			#print "checking if album name in format: " + temp_album.upper().lower() + " is in " + file.upper().lower()
-			if not album_match_found:
+			# count occurences of album name in file name
+			if album_words == 1:
+				if album.upper().lower() in file.upper().lower():
+					albumname_matches += 1
+			else:
+				temp_album = album.replace(' ','_')
 				if temp_album.upper().lower() in file.upper().lower():
 					albumname_matches += 1
-			if artist.upper().lower() in file.upper().lower():
-				artistname_matches += 1
-				artist_match_found = True
-			temp_artist = artist.replace(' ','_')
-			#print "checking if artist name in format: " + temp_artist.upper().lower() + " is in " + file.upper().lower()
-			if not artist_match_found:
+
+			# count occurences of artist name in file name
+
+			if artist_words == 1:
+				if artist.upper().lower() in file.upper().lower():
+					artistname_matches += 1
+			else:
+				temp_artist = artist.replace(' ','_')
 				if temp_artist.upper().lower() in file.upper().lower():
 					artistname_matches += 1
 
 
 songfiles.sort()
-
-print "artistname_matches: " + str(artistname_matches) + ", albumname_matches: " + str(albumname_matches) + ", artist_words: " + str(artist_words) + ", album_words: " + str(album_words) 
 
 # Different implementations to be tested. Maybe to be chosen with command line argument?
 
@@ -112,20 +109,19 @@ for song in songfiles:
 				word = part[:idx]
 			else:
 				word = part 
-			if albumname_matches > 0: # check if word is artist or album name in filename. If so, discard.
+
+# If more than half of files contained artist or album name,check if word is (or is part of) artist or album name in filename. If so, discard.
+			if albumname_matches >= len(songfiles)/2: 
 				if word.upper().lower() == album.upper().lower():
 					continue
 				if album_words > 1:
-					print "checking if word " + word.upper().lower() + " is in album name " + album.upper().lower()
 					if word.upper().lower() in album.upper().lower():
-						print "found that word " + word + " is in album name, and should be discarded"
 						continue
 
-			if artistname_matches > 0:
+			if artistname_matches >= len(songfiles)/2:
 				if word.upper().lower() == artist.upper().lower():
 					continue
 				if artist_words > 1:
-					print "checking if word " + word.upper().lower() + " is in artist name " + artist.upper().lower()
 					if word.upper().lower() in artist.upper().lower():
 						continue
 			# append word to title title string if appropriate
