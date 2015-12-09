@@ -1,10 +1,21 @@
 # Tool to create id3 tags for all mp3 files in folder from filename data.
 
+# TODO:
+# file names should be split only by spaces and underscores
+
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 import os
 import sys
 import re
+
+songfiles = []
+albumname_matches = 0
+artistname_matches = 0
+tag_year = False;
+tag_genre = False;
+
+#print EasyID3.valid_keys.keys()
 
 if not len(sys.argv) == 2:
 	sys.exit("You must execute the script with 1 command line argument, containing the path to the folder containing mp3 files.\n"
@@ -15,10 +26,16 @@ print 'Welcome to mp3 tag fixer.\n'
 file_path = sys.argv[1]
 artist = raw_input('name of artist: ')
 album = raw_input('name of album: ')
-year = raw_input('year of release (optional')
-songfiles = []
-albumname_matches = 0
-artistname_matches = 0
+year = raw_input('year of release (optional): ')
+genre = raw_input('genre of album (optional): ')
+
+if artist is "" or album is "":
+	sys.exit("You must provide artist and album name. Script ending.")
+
+if year is not "":
+	tag_year = True
+if genre is not "":
+	tag_genre = True
 
 for root, dirs, files in os.walk(file_path):
 	for file in files:
@@ -42,7 +59,6 @@ for song in songfiles:
 	word_count = 0;
 
 	song_parts = re.split("\W+|_", song) # splits http://stackoverflow.com/questions/1059559/python-split-strings-with-multiple-delimiters
-	#print song_parts
 	for part in song_parts:
 		number_ok = True
 		if part.startswith(tuple('0123456789')): 
@@ -77,8 +93,11 @@ for song in songfiles:
 	audio["artist"] = u"" + artist
 	audio["album"] = u"" + album
 	audio["title"] = u"" + title_str
+	if tag_genre:
+		audio["genre"] = u"" + genre
+	if tag_year:
+		audio["date"] = year
 	audio.save(v1=2)
 	audio.save()
-	print albumname_matches
 
-print "Done editing files. Please check files for errors and correct if necessary."
+sys.exit("Done editing files. Please check files for errors and correct if necessary.")
