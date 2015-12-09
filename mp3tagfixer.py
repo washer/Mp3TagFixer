@@ -15,7 +15,7 @@ artistname_matches = 0
 tag_year = False;
 tag_genre = False;
 
-#print EasyID3.valid_keys.keys()
+#print EasyID3.valid_keys.keys() # prints all valid tags that can be edited with EasyID3
 
 if not len(sys.argv) == 2:
 	sys.exit("You must execute the script with 1 command line argument, containing the path to the folder containing mp3 files.\n"
@@ -50,14 +50,15 @@ songfiles.sort()
 
 # Different implementations to be tested. Maybe to be chosen with command line argument?
 
-# First implementation splits string by spaces, so fails if there is no space between words or numbers.
-# Alo as of now cannot handle if string also contains album or artist name
+# First implementation splits string by spaces & underscores,
+# so it fails if there is no space or underscore between words or numbers.
 
 for song in songfiles:
 	audio = MP3(file_path + "/" + song, ID3=EasyID3)
 	title_str = ""
 	word_count = 0;
 
+	# change splitting so that it only splits on spaces and underscores
 	song_parts = re.split("\W+|_", song) # splits http://stackoverflow.com/questions/1059559/python-split-strings-with-multiple-delimiters
 	for part in song_parts:
 		number_ok = True
@@ -94,7 +95,7 @@ for song in songfiles:
 	audio["album"] = u"" + album
 	audio["title"] = u"" + title_str
 	if tag_genre:
-		audio["genre"] = u"" + genre
+		audio["genre"] = genre
 	if tag_year:
 		audio["date"] = year
 	audio.save(v1=2)
