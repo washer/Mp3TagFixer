@@ -1,8 +1,5 @@
 # Tool to create id3 tags for all mp3 files in folder from filename data.
 
-# TODO:
-# file names should be split only by spaces and underscores
-
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 import os
@@ -58,8 +55,8 @@ for song in songfiles:
 	title_str = ""
 	word_count = 0;
 
-	# change splitting so that it only splits on spaces and underscores
-	song_parts = re.split("\W+|_", song) # splits http://stackoverflow.com/questions/1059559/python-split-strings-with-multiple-delimiters
+	# song_parts = re.split("\W+|_", song) # splits http://stackoverflow.com/questions/1059559/python-split-strings-with-multiple-delimiters
+	song_parts = song.replace('_',' ').split()
 	for part in song_parts:
 		number_ok = True
 		if part.startswith(tuple('0123456789')): 
@@ -76,7 +73,7 @@ for song in songfiles:
 			word = ""
 			word_count += 1
 			if 'mp3' in part:
-				idx = part.find('mp3')
+				idx = part.find('.mp3')
 				word = part[:idx]
 			else:
 				word = part
