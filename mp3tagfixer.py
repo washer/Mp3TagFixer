@@ -1,4 +1,6 @@
 # Tool to create id3 tags for all mp3 files in folder from filename data.
+# Remember to save data as ID3.1 for windows
+# Fix filenames with spaces for windows
 
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
