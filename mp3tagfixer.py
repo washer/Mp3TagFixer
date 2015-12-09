@@ -1,6 +1,4 @@
 # Tool to create id3 tags for all mp3 files in folder from filename data.
-# Remember to save data as ID3.1 for windows
-# Fix filenames with spaces for windows
 
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
@@ -25,7 +23,7 @@ songfiles = []
 for root, dirs, files in os.walk(file_path):
 	for file in files:
 		if file.endswith(".mp3"):
-			songfiles.append(file)
+			songfiles.append(r""+file)
 
 songfiles.sort()
 #print songfiles
@@ -36,8 +34,7 @@ songfiles.sort()
 # Alo as of now cannot handle if string also contains album or artist name
 
 for song in songfiles:
-	audio = MP3(song, ID3=EasyID3)
-	#audio.pprint()
+	audio = MP3(file_path + "/" + song, ID3=EasyID3)
 	title_str = ""
 	word_count = 0;
 
@@ -70,8 +67,11 @@ for song in songfiles:
 	audio["artist"] = u"" + artist
 	audio["album"] = u"" + album
 	audio["title"] = u"" + title_str
-	audio.save()
-	print artist + ", " + album + ", " + title_str
+	print audio.pprint()
+	audio.save(v1=2)
+	#audio.save(v2_version=3)
+	#audio.save()
+	#print artist + ", " + album + ", " + title_str
 
 		#if part == album or part == artist: FIND A WAY TO CHECK IF ALL SONGS CONTAIN SAME TEXT - maybe loop and count?
 			#song_parts.remove(part)
