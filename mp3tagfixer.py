@@ -55,7 +55,7 @@ for root, dirs, files in os.walk(file_path):
 	for file in files:
 		if file.endswith(".mp3"):
 			songfiles.append(file)
-			# count occurences of album name in file name
+			# count occurences of album name in file name (don't get why this work, but it does, revisit logic with the temp vars)
 			if album_words == 1:
 				if album.upper().lower() in file.upper().lower():
 					albumname_matches += 1
